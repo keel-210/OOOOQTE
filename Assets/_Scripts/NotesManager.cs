@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-
+using UnityEngine.Events;
 public class NotesManager : MonoBehaviour
 {
 	[SerializeField] string CSVName;
@@ -10,7 +10,9 @@ public class NotesManager : MonoBehaviour
 	public List<Note> CheckingNotes = new List<Note>();
 	public List<Note> Notes = new List<Note>();
 	public List<RectTransform> QTE_Transform = new List<RectTransform>();
-
+	[System.Serializable]
+	public class NoteTapEvent : UnityEvent<NoteEnum> { }
+	public NoteTapEvent OnSuccess = new NoteTapEvent(), OnFailed = new NoteTapEvent();
 	bool IsPlaying;
 	public float ManagedTime;
 	public int PerfectRange = 40, GoodRange = 80, CheckRange = 120;
@@ -77,15 +79,11 @@ public class NotesManager : MonoBehaviour
 	}
 	void Success(Note n)
 	{
-		if (n.NoteType == NoteEnum.Up || n.NoteType == NoteEnum.Down || n.NoteType == NoteEnum.Right || n.NoteType == NoteEnum.Left)
-			player.Move(n.NoteType);
-		else
-			player.Shot(n.NoteType);
+		OnSuccess.Invoke(n.NoteType);
 	}
 	public void Failed(Note n)
 	{
-		if (n.NoteType == NoteEnum.Up || n.NoteType == NoteEnum.Down || n.NoteType == NoteEnum.Right || n.NoteType == NoteEnum.Left)
-			player.MoveFail(n.NoteType);
+		OnFailed.Invoke(n.NoteType);
 	}
 	public void AddCheck(Note n)
 	{
